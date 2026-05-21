@@ -33,7 +33,7 @@
       font-family: Arial, "Noto Sans KR", sans-serif;
       background:
         linear-gradient(rgba(245, 247, 242, 0.78), rgba(245, 247, 242, 0.88)),
-        url("photo/꿈돌이.jfif") center / cover fixed;
+        url("photo/꿈돌이 고화질.png") center / cover fixed;
       color: var(--ink);
     }
 
@@ -44,7 +44,7 @@
       z-index: -1;
       background:
         linear-gradient(90deg, rgba(245, 247, 242, 0.94), rgba(245, 247, 242, 0.62)),
-        url("photo/꿈돌이.jfif") center / cover no-repeat;
+        url("photo/꿈돌이 고화질.png") center / cover no-repeat;
     }
 
     a {
@@ -105,6 +105,26 @@
 
     .nav-links a:hover {
       color: var(--accent-strong);
+    }
+
+    .nav-menu-toggle {
+      min-height: 40px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 12px;
+      background: rgba(255, 255, 255, 0.82);
+      color: var(--ink);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .nav-menu-toggle svg {
+      width: 18px;
+      height: 18px;
     }
 
     .container {
@@ -505,15 +525,36 @@
       .nav {
         height: auto;
         min-height: 64px;
-        align-items: flex-start;
+        flex-wrap: wrap;
+        align-items: center;
         padding: 14px 0;
       }
 
+      .nav-menu-toggle {
+        display: inline-flex;
+      }
+
       .nav-links {
-        gap: 12px;
-        overflow-x: auto;
-        padding-bottom: 4px;
-        font-size: 13px;
+        width: 100%;
+        display: none;
+        flex-basis: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        overflow: hidden;
+        padding-top: 8px;
+        font-size: 14px;
+      }
+
+      .site-header.menu-open .nav-links {
+        display: flex;
+      }
+
+      .nav-links a {
+        min-height: 46px;
+        display: flex;
+        align-items: center;
+        border-top: 1px solid rgba(220, 227, 216, 0.95);
       }
 
       .hero {
@@ -552,7 +593,13 @@
         <span class="brand-mark">0I</span>
         <span>0Interpreter</span>
       </a>
-      <div class="nav-links">
+      <button class="nav-menu-toggle" type="button" aria-expanded="false" aria-controls="navLinks">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        더보기
+      </button>
+      <div class="nav-links" id="navLinks">
         <a href="#about">소개</a>
         <a href="#skills">기술</a>
         <a href="#projects">프로젝트</a>
@@ -772,6 +819,9 @@
     const projectCards = document.querySelectorAll(".project-card");
     const copyEmailButton = document.getElementById("copyEmail");
     const toast = document.getElementById("toast");
+    const siteHeader = document.querySelector(".site-header");
+    const menuToggle = document.querySelector(".nav-menu-toggle");
+    const navLinks = document.querySelectorAll(".nav-links a");
 
     filterButtons.forEach((button) => {
       button.addEventListener("click", () => {
@@ -804,6 +854,18 @@
       } catch (error) {
         showToast(email);
       }
+    });
+
+    menuToggle.addEventListener("click", () => {
+      const isOpen = siteHeader.classList.toggle("menu-open");
+      menuToggle.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    navLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        siteHeader.classList.remove("menu-open");
+        menuToggle.setAttribute("aria-expanded", "false");
+      });
     });
   </script>
 </body>
