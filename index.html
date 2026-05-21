@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>나의 용돈기입장</title>
+
+  <style>
+    /* =========================
+       전체 기본 스타일
+    ========================= */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Arial", "맑은 고딕", sans-serif;
+      background: #f7fbff;
+      color: #333;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 32px;
+      color: #3b6ea8;
+    }
+
+    header p {
+      margin-top: 8px;
+      font-size: 16px;
+      color: #6b7280;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 8px 20px rgba(80, 120, 160, 0.12);
+      margin-bottom: 20px;
+    }
+
+    /* =========================
+       요약 카드
+    ========================= */
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card {
+      text-align: center;
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .summary-card h2 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: #555;
+    }
+
+    .summary-card p {
+      margin: 0;
+      font-size: 23px;
+      font-weight: bold;
+    }
+
+    .income-card {
+      background: #e8f3ff;
+      color: #2563eb;
+    }
+
+    .expense-card {
+      background: #ffecec;
+      color: #dc2626;
+    }
+
+    .saving-card {
+      background: #fff7d6;
+      color: #b7791f;
+    }
+
+    .balance-card {
+      background: #ecfdf3;
+      color: #16a34a;
+    }
+
+    /* 잔액이 마이너스일 때 JavaScript가 이 클래스를 붙입니다. */
+    .balance-negative {
+      background: #ffe4e6;
+      color: #e11d48;
+    }
+
+    /* =========================
+       입력 폼
+    ========================= */
+    .section-title {
+      margin-top: 0;
+      color: #3b6ea8;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      margin-bottom: 6px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d7e3f0;
+      border-radius: 12px;
+      font-size: 15px;
+      background: #fbfdff;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    /* =========================
+       버튼
+    ========================= */
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      opacity: 0.9;
+    }
+
+    .submit-btn {
+      margin-top: 16px;
+      width: 100%;
+      background: #7cc4ff;
+      color: #ffffff;
+    }
+
+    .filter-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .filter-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: #eef6ff;
+      color: #3b6ea8;
+      border: 1px solid #cde6ff;
+    }
+
+    .filter-btn.active {
+      background: #3b82f6;
+      color: #ffffff;
+    }
+
+    .month-filter {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: bold;
+      color: #4b5563;
+    }
+
+    .month-filter input {
+      width: 170px;
+    }
+
+    .delete-btn {
+      background: #ffd6d6;
+      color: #b91c1c;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
+    .reset-btn {
+      width: 100%;
+      background: #ffb4b4;
+      color: #8a1111;
+      margin-top: 10px;
+    }
+
+    /* =========================
+       기록 목록 표
+    ========================= */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 850px;
+    }
+
+    th,
+    td {
+      padding: 14px 10px;
+      text-align: center;
+      border-bottom: 1px solid #edf2f7;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f1f7ff;
+      color: #3b6ea8;
+    }
+
+    .type-income {
+      color: #2563eb;
+      font-weight: bold;
+    }
+
+    .type-expense {
+      color: #dc2626;
+      font-weight: bold;
+    }
+
+    .type-saving {
+      color: #b7791f;
+      font-weight: bold;
+    }
+
+    .empty-message {
+      text-align: center;
+      color: #777;
+      padding: 24px;
+    }
+
+    footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 13px;
+      color: #8b95a1;
+    }
+
+    /* =========================
+       모바일 반응형
+    ========================= */
+    @media (max-width: 800px) {
+      header h1 {
+        font-size: 26px;
+      }
+
+      .summary {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-card p {
+        font-size: 21px;
+      }
+
+      .filter-area {
+        align-items: stretch;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .filter-buttons,
+      .month-filter {
+        width: 100%;
+      }
+
+      .filter-btn,
+      .month-filter input {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- 1. 제목 영역 -->
+    <header>
+      <h1>나의 용돈기입장</h1>
+      <p>수입과 지출을 기록하며 돈 관리 습관을 길러요</p>
+    </header>
+
+    <!-- 2. 총 수입 / 총 지출 / 총 저축 / 현재 잔액 요약 카드 -->
+    <section class="summary">
+      <div class="summary-card income-card">
+        <h2>총 수입</h2>
+        <p id="totalIncome">0원</p>
+      </div>
+
+      <div class="summary-card expense-card">
+        <h2>총 지출</h2>
+        <p id="totalExpense">0원</p>
+      </div>
+
+      <div class="summary-card saving-card">
+        <h2>총 저축</h2>
+        <p id="totalSaving">0원</p>
+      </div>
+
+      <div id="balanceCard" class="summary-card balance-card">
+        <h2>현재 잔액</h2>
+        <p id="balance">0원</p>
+      </div>
+    </section>
+
+    <!-- 3. 입력 폼 -->
+    <section class="card">
+      <h2 class="section-title">기록 추가하기</h2>
+
+      <form id="moneyForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="date">날짜</label>
+            <input type="date" id="date" />
+          </div>
+
+          <div class="form-group">
+            <label for="type">구분</label>
+            <select id="type">
+              <option value="income">수입</option>
+              <option value="expense">지출</option>
+              <option value="saving">저축</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="category">카테고리</label>
+            <select id="category">
+              <option value="용돈">용돈</option>
+              <option value="간식">간식</option>
+              <option value="교통">교통</option>
+              <option value="학용품">학용품</option>
+              <option value="저축">저축</option>
+              <option value="기타">기타</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="title">항목명</label>
+            <input type="text" id="title" placeholder="예: 주간 용돈, 간식, 버스비" />
+          </div>
+
+          <div class="form-group">
+            <label for="amount">금액</label>
+            <input type="number" id="amount" placeholder="예: 5000" min="1" />
+          </div>
+
+          <div class="form-group full">
+            <label for="memo">메모</label>
+            <textarea id="memo" placeholder="간단한 메모를 적어보세요"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn">등록하기</button>
+      </form>
+    </section>
+
+    <!-- 4. 필터 버튼 + 월별 조회 -->
+    <section class="filter-area">
+      <div class="filter-buttons">
+        <button class="filter-btn active" data-filter="all">전체 보기</button>
+        <button class="filter-btn" data-filter="income">수입만 보기</button>
+        <button class="filter-btn" data-filter="expense">지출만 보기</button>
+        <button class="filter-btn" data-filter="saving">저축만 보기</button>
+      </div>
+
+      <label class="month-filter" for="monthFilter">
+        월별 조회
+        <input type="month" id="monthFilter" />
+      </label>
+    </section>
+
+    <!-- 5. 기록 목록 표 -->
+    <section class="card">
+      <h2 class="section-title">기록 목록</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>날짜</th>
+              <th>구분</th>
+              <th>카테고리</th>
+              <th>항목명</th>
+              <th>금액</th>
+              <th>메모</th>
+              <th>삭제</th>
+            </tr>
+          </thead>
+
+          <tbody id="recordList">
+            <!-- JavaScript로 기록이 들어가는 자리 -->
+          </tbody>
+        </table>
+      </div>
+
+      <p id="emptyMessage" class="empty-message">아직 등록된 기록이 없어요.</p>
+    </section>
+
+    <!-- 6. 전체 기록 초기화 버튼 -->
+    <button id="resetBtn" class="reset-btn">전체 기록 초기화</button>
+
+    <!-- 7. 하단 저작권 문구 -->
+    <footer>© 2026 크레오디교육연구소</footer>
+  </div>
+
+  <script>
+    /*
+      이번 버전에 추가된 기능
+
+      1. 구분에 "저축" 추가
+      2. 카테고리 입력 추가
+      3. 기록 목록을 날짜순으로 정렬
+      4. 현재 잔액이 0원보다 작으면 빨간색으로 표시
+      5. 월별 조회 기능 추가
+    */
+
+    let records = [];
+    let currentFilter = "all";
+    let currentMonth = "";
+
+    const STORAGE_KEY = "myMoneyBookRecordsV2";
+
+    // HTML 요소 가져오기
+    const moneyForm = document.getElementById("moneyForm");
+    const dateInput = document.getElementById("date");
+    const typeInput = document.getElementById("type");
+    const categoryInput = document.getElementById("category");
+    const titleInput = document.getElementById("title");
+    const amountInput = document.getElementById("amount");
+    const memoInput = document.getElementById("memo");
+
+    const recordList = document.getElementById("recordList");
+    const emptyMessage = document.getElementById("emptyMessage");
+
+    const totalIncomeEl = document.getElementById("totalIncome");
+    const totalExpenseEl = document.getElementById("totalExpense");
+    const totalSavingEl = document.getElementById("totalSaving");
+    const balanceEl = document.getElementById("balance");
+    const balanceCard = document.getElementById("balanceCard");
+
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const monthFilter = document.getElementById("monthFilter");
+    const resetBtn = document.getElementById("resetBtn");
+
+    // 오늘 날짜를 yyyy-mm-dd 형태로 만들어주는 함수
+    function getTodayDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
+
+      return `${year}-${month}-${day}`;
+    }
+
+    // 숫자를 1,000원처럼 천 단위 콤마가 들어간 금액으로 바꾸는 함수
+    function formatMoney(number) {
+      return Number(number).toLocaleString("ko-KR") + "원";
+    }
+
+    // localStorage에 기록 저장하기
+    function saveRecords() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    // localStorage에서 기록 불러오기
+    function loadRecords() {
+      const savedData = localStorage.getItem(STORAGE_KEY);
+
+      if (savedData) {
+        records = JSON.parse(savedData);
+      }
+    }
+
+    // 요약 카드는 전체 기록 기준으로 계산합니다.
+    // 잔액은 총 수입 - 총 지출 - 총 저축으로 계산했습니다.
+    function updateSummary() {
+      let totalIncome = 0;
+      let totalExpense = 0;
+      let totalSaving = 0;
+
+      records.forEach(function(record) {
+        if (record.type === "income") {
+          totalIncome += record.amount;
+        } else if (record.type === "expense") {
+          totalExpense += record.amount;
+        } else if (record.type === "saving") {
+          totalSaving += record.amount;
+        }
+      });
+
+      const balance = totalIncome - totalExpense - totalSaving;
+
+      totalIncomeEl.textContent = formatMoney(totalIncome);
+      totalExpenseEl.textContent = formatMoney(totalExpense);
+      totalSavingEl.textContent = formatMoney(totalSaving);
+      balanceEl.textContent = formatMoney(balance);
+
+      // 잔액이 마이너스이면 빨간색 카드로 바꿉니다.
+      if (balance < 0) {
+        balanceCard.classList.add("balance-negative");
+      } else {
+        balanceCard.classList.remove("balance-negative");
+      }
+    }
+
+    // 현재 선택된 구분 필터와 월별 필터에 맞는 기록만 골라냅니다.
+    function getFilteredRecords() {
+      let filteredRecords = records;
+
+      if (currentFilter !== "all") {
+        filteredRecords = filteredRecords.filter(function(record) {
+          return record.type === currentFilter;
+        });
+      }
+
+      if (currentMonth !== "") {
+        filteredRecords = filteredRecords.filter(function(record) {
+          return record.date.startsWith(currentMonth);
+        });
+      }
+
+      // 날짜순 정렬: 오래된 날짜가 위, 최신 날짜가 아래에 보입니다.
+      filteredRecords = filteredRecords.slice().sort(function(a, b) {
+        return new Date(a.date) - new Date(b.date);
+      });
+
+      return filteredRecords;
+    }
+
+    // 구분 값을 화면에 보여줄 한글 이름과 색상 클래스로 바꿉니다.
+    function getTypeInfo(type) {
+      if (type === "income") {
+        return { text: "수입", className: "type-income" };
+      }
+
+      if (type === "expense") {
+        return { text: "지출", className: "type-expense" };
+      }
+
+      return { text: "저축", className: "type-saving" };
+    }
+
+    // 기록 목록을 화면에 다시 그리기
+    function renderRecords() {
+      recordList.innerHTML = "";
+
+      const filteredRecords = getFilteredRecords();
+
+      if (filteredRecords.length === 0) {
+        emptyMessage.style.display = "block";
+      } else {
+        emptyMessage.style.display = "none";
+      }
+
+      filteredRecords.forEach(function(record) {
+        const tr = document.createElement("tr");
+        const typeInfo = getTypeInfo(record.type);
+
+        tr.innerHTML = `
+          <td>${record.date}</td>
+          <td class="${typeInfo.className}">${typeInfo.text}</td>
+          <td>${record.category}</td>
+          <td>${record.title}</td>
+          <td>${formatMoney(record.amount)}</td>
+          <td>${record.memo}</td>
+          <td>
+            <button class="delete-btn" onclick="deleteRecord(${record.id})">
+              삭제
+            </button>
+          </td>
+        `;
+
+        recordList.appendChild(tr);
+      });
+    }
+
+    // 화면 전체를 새로 갱신하는 함수
+    function updateScreen() {
+      updateSummary();
+      renderRecords();
+    }
+
+    // 기록 등록하기
+    moneyForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const date = dateInput.value || getTodayDate();
+      const type = typeInput.value;
+      const category = categoryInput.value;
+      const title = titleInput.value.trim();
+      const amount = Number(amountInput.value);
+      const memo = memoInput.value.trim();
+
+      if (title === "") {
+        alert("항목명을 입력해 주세요.");
+        titleInput.focus();
+        return;
+      }
+
+      if (!amount || amount <= 0) {
+        alert("금액은 0원보다 큰 숫자로 입력해 주세요.");
+        amountInput.focus();
+        return;
+      }
+
+      const newRecord = {
+        id: Date.now(),
+        date: date,
+        type: type,
+        category: category,
+        title: title,
+        amount: amount,
+        memo: memo
+      };
+
+      records.push(newRecord);
+      saveRecords();
+      updateScreen();
+
+      // 등록 후 입력창 비우기
+      moneyForm.reset();
+    });
+
+    // 기록 삭제하기
+    function deleteRecord(id) {
+      records = records.filter(function(record) {
+        return record.id !== id;
+      });
+
+      saveRecords();
+      updateScreen();
+    }
+
+    // 필터 버튼 클릭 기능
+    filterButtons.forEach(function(button) {
+      button.addEventListener("click", function() {
+        currentFilter = button.dataset.filter;
+
+        filterButtons.forEach(function(btn) {
+          btn.classList.remove("active");
+        });
+
+        button.classList.add("active");
+        renderRecords();
+      });
+    });
+
+    // 월별 조회 기능
+    monthFilter.addEventListener("change", function() {
+      currentMonth = monthFilter.value;
+      renderRecords();
+    });
+
+    // 전체 기록 초기화 기능
+    resetBtn.addEventListener("click", function() {
+      const answer = confirm("정말 모든 기록을 삭제할까요?");
+
+      if (answer) {
+        records = [];
+        saveRecords();
+        updateScreen();
+      }
+    });
+
+    // 페이지가 처음 열릴 때 저장된 기록을 불러오고 화면에 보여주기
+    loadRecords();
+    updateScreen();
+  </script>
+</body>
+</html>
