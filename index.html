@@ -3,722 +3,796 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>나의 용돈기입장</title>
-
+  <title>0Interpreter Portfolio</title>
   <style>
-    /* =========================
-       전체 기본 스타일
-    ========================= */
+    :root {
+      --bg: #f5f7f2;
+      --surface: #ffffff;
+      --ink: #1b1f24;
+      --muted: #637064;
+      --line: #dce3d8;
+      --accent: #0f766e;
+      --accent-strong: #115e59;
+      --warm: #c76f3a;
+      --mint: #dff3e8;
+      --blue: #dceaf7;
+      --shadow: 0 18px 48px rgba(24, 38, 33, 0.1);
+    }
+
     * {
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
-      font-family: "Arial", "맑은 고딕", sans-serif;
-      background: #f7fbff;
-      color: #333;
+      font-family: Arial, "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid rgba(220, 227, 216, 0.88);
+      background: rgba(245, 247, 242, 0.9);
+      backdrop-filter: blur(14px);
+    }
+
+    .nav {
+      width: min(1120px, calc(100% - 32px));
+      height: 68px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: var(--ink);
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-strong);
     }
 
     .container {
-      width: 100%;
-      max-width: 1100px;
+      width: min(1120px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 24px 16px;
     }
 
-    header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 32px;
-      color: #3b6ea8;
-    }
-
-    header p {
-      margin-top: 8px;
-      font-size: 16px;
-      color: #6b7280;
-    }
-
-    .card {
-      background: #ffffff;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 8px 20px rgba(80, 120, 160, 0.12);
-      margin-bottom: 20px;
-    }
-
-    /* =========================
-       요약 카드
-    ========================= */
-    .summary {
+    .hero {
+      min-height: calc(100vh - 68px);
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .summary-card {
-      text-align: center;
-      border-radius: 18px;
-      padding: 20px;
-    }
-
-    .summary-card h2 {
-      margin: 0 0 10px;
-      font-size: 16px;
-      color: #555;
-    }
-
-    .summary-card p {
-      margin: 0;
-      font-size: 23px;
-      font-weight: bold;
-    }
-
-    .income-card {
-      background: #e8f3ff;
-      color: #2563eb;
-    }
-
-    .expense-card {
-      background: #ffecec;
-      color: #dc2626;
-    }
-
-    .saving-card {
-      background: #fff7d6;
-      color: #b7791f;
-    }
-
-    .balance-card {
-      background: #ecfdf3;
-      color: #16a34a;
-    }
-
-    /* 잔액이 마이너스일 때 JavaScript가 이 클래스를 붙입니다. */
-    .balance-negative {
-      background: #ffe4e6;
-      color: #e11d48;
-    }
-
-    /* =========================
-       입력 폼
-    ========================= */
-    .section-title {
-      margin-top: 0;
-      color: #3b6ea8;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .form-group label {
-      margin-bottom: 6px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #d7e3f0;
-      border-radius: 12px;
-      font-size: 15px;
-      background: #fbfdff;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
-
-    .full {
-      grid-column: 1 / -1;
-    }
-
-    /* =========================
-       버튼
-    ========================= */
-    button {
-      border: none;
-      border-radius: 999px;
-      padding: 12px 18px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      opacity: 0.9;
-    }
-
-    .submit-btn {
-      margin-top: 16px;
-      width: 100%;
-      background: #7cc4ff;
-      color: #ffffff;
-    }
-
-    .filter-area {
-      display: flex;
-      justify-content: space-between;
+      grid-template-columns: 1.08fr 0.92fr;
+      gap: 48px;
       align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
+      padding: 58px 0 36px;
     }
 
-    .filter-buttons {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .filter-btn {
-      background: #eef6ff;
-      color: #3b6ea8;
-      border: 1px solid #cde6ff;
-    }
-
-    .filter-btn.active {
-      background: #3b82f6;
-      color: #ffffff;
-    }
-
-    .month-filter {
-      display: flex;
+    .eyebrow {
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-weight: bold;
-      color: #4b5563;
+      margin: 0 0 18px;
+      color: var(--accent-strong);
+      font-size: 14px;
+      font-weight: 800;
     }
 
-    .month-filter input {
-      width: 170px;
+    .status-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #23a46f;
+      box-shadow: 0 0 0 6px rgba(35, 164, 111, 0.12);
     }
 
-    .delete-btn {
-      background: #ffd6d6;
-      color: #b91c1c;
-      padding: 8px 12px;
-      font-size: 13px;
+    h1 {
+      margin: 0;
+      max-width: 780px;
+      font-size: clamp(44px, 8vw, 86px);
+      line-height: 0.95;
+      letter-spacing: 0;
     }
 
-    .reset-btn {
+    .hero-copy {
+      max-width: 660px;
+      margin: 24px 0 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .btn {
+      min-height: 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      border: 1px solid var(--ink);
+      border-radius: 8px;
+      padding: 0 17px;
+      background: var(--ink);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .btn.secondary {
+      background: transparent;
+      color: var(--ink);
+    }
+
+    .visual {
+      position: relative;
+      min-height: 520px;
+      display: grid;
+      place-items: center;
+    }
+
+    .portrait {
+      width: min(100%, 430px);
+      aspect-ratio: 4 / 5;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      background: #ecf0e8;
+      box-shadow: var(--shadow);
+    }
+
+    .portrait svg {
       width: 100%;
-      background: #ffb4b4;
-      color: #8a1111;
-      margin-top: 10px;
+      height: 100%;
+      display: block;
     }
 
-    /* =========================
-       기록 목록 표
-    ========================= */
-    .table-wrap {
-      overflow-x: auto;
+    .float-panel {
+      position: absolute;
+      right: 0;
+      bottom: 48px;
+      width: min(280px, 62%);
+      border: 1px solid rgba(27, 31, 36, 0.1);
+      border-radius: 8px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 18px 36px rgba(24, 38, 33, 0.13);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 850px;
-    }
-
-    th,
-    td {
-      padding: 14px 10px;
-      text-align: center;
-      border-bottom: 1px solid #edf2f7;
+    .float-panel strong {
+      display: block;
+      margin-bottom: 8px;
       font-size: 14px;
     }
 
-    th {
-      background: #f1f7ff;
-      color: #3b6ea8;
+    .float-panel span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
     }
 
-    .type-income {
-      color: #2563eb;
-      font-weight: bold;
+    section {
+      padding: 76px 0;
     }
 
-    .type-expense {
-      color: #dc2626;
-      font-weight: bold;
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 28px;
+      margin-bottom: 28px;
     }
 
-    .type-saving {
-      color: #b7791f;
-      font-weight: bold;
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.05;
+      letter-spacing: 0;
     }
 
-    .empty-message {
-      text-align: center;
-      color: #777;
+    .section-head p {
+      max-width: 520px;
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    .info-card,
+    .project-card,
+    .contact-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+
+    .info-card {
+      min-height: 188px;
       padding: 24px;
     }
 
-    footer {
-      margin-top: 28px;
+    .info-card .icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      background: var(--mint);
+      color: var(--accent-strong);
+    }
+
+    .info-card:nth-child(2) .icon {
+      background: var(--blue);
+      color: #315f86;
+    }
+
+    .info-card:nth-child(3) .icon {
+      background: #f6e5d7;
+      color: var(--warm);
+    }
+
+    .info-card h3,
+    .project-card h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .info-card p,
+    .project-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.68;
+    }
+
+    .skills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 12px;
+      background: #fff;
+      color: #34413a;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .project-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .filter-btn {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 13px;
+      background: #fff;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .filter-btn.active {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .projects {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .project-card {
+      min-height: 320px;
+      overflow: hidden;
+    }
+
+    .project-art {
+      height: 142px;
+      border-bottom: 1px solid var(--line);
+      background: #eef4ed;
+    }
+
+    .project-card:nth-child(2) .project-art {
+      background: #edf3fa;
+    }
+
+    .project-card:nth-child(3) .project-art {
+      background: #f7eadc;
+    }
+
+    .project-body {
+      padding: 22px;
+    }
+
+    .project-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .small-tag {
+      border-radius: 8px;
+      padding: 6px 9px;
+      background: #f4f6f1;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .contact-panel {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      padding: 34px;
+      background: #fff;
+    }
+
+    .contact-panel h2 {
+      margin: 0 0 12px;
+      font-size: clamp(30px, 5vw, 48px);
+      line-height: 1.05;
+    }
+
+    .contact-panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 12px;
+      align-content: center;
+    }
+
+    .contact-link {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 14px;
+      background: #fafbf8;
+      color: var(--ink);
+      font-weight: 800;
+    }
+
+    .footer {
+      padding: 24px 0 44px;
+      color: var(--muted);
+      font-size: 14px;
       text-align: center;
-      font-size: 13px;
-      color: #8b95a1;
     }
 
-    /* =========================
-       모바일 반응형
-    ========================= */
-    @media (max-width: 800px) {
-      header h1 {
-        font-size: 26px;
-      }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 20;
+      transform: translate(-50%, 18px);
+      opacity: 0;
+      pointer-events: none;
+      border-radius: 8px;
+      padding: 12px 16px;
+      background: var(--ink);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 800;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
 
-      .summary {
-        grid-template-columns: 1fr 1fr;
-      }
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
 
-      .form-grid {
+    @media (max-width: 900px) {
+      .hero,
+      .contact-panel {
         grid-template-columns: 1fr;
       }
 
-      .summary-card p {
-        font-size: 21px;
+      .hero {
+        padding-top: 44px;
       }
 
-      .filter-area {
-        align-items: stretch;
+      .visual {
+        min-height: 440px;
       }
-    }
 
-    @media (max-width: 520px) {
-      .summary {
+      .about-grid,
+      .projects {
         grid-template-columns: 1fr;
       }
 
-      .filter-buttons,
-      .month-filter {
-        width: 100%;
+      .section-head {
+        display: block;
       }
 
-      .filter-btn,
-      .month-filter input {
-        flex: 1;
+      .section-head p {
+        margin-top: 14px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav {
+        height: auto;
+        min-height: 64px;
+        align-items: flex-start;
+        padding: 14px 0;
+      }
+
+      .nav-links {
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        font-size: 13px;
+      }
+
+      .hero {
+        min-height: auto;
+      }
+
+      .hero-copy {
+        font-size: 16px;
+      }
+
+      .visual {
+        min-height: 360px;
+      }
+
+      .float-panel {
+        left: 14px;
+        right: 14px;
+        bottom: 18px;
+        width: auto;
+      }
+
+      section {
+        padding: 56px 0;
+      }
+
+      .contact-panel {
+        padding: 24px;
       }
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
-    <!-- 1. 제목 영역 -->
-    <header>
-      <h1>나의 용돈기입장</h1>
-      <p>수입과 지출을 기록하며 돈 관리 습관을 길러요</p>
-    </header>
+  <header class="site-header">
+    <nav class="nav" aria-label="주요 메뉴">
+      <a class="brand" href="#home" aria-label="홈으로 이동">
+        <span class="brand-mark">0I</span>
+        <span>0Interpreter</span>
+      </a>
+      <div class="nav-links">
+        <a href="#about">소개</a>
+        <a href="#skills">기술</a>
+        <a href="#projects">프로젝트</a>
+        <a href="#contact">연락</a>
+      </div>
+    </nav>
+  </header>
 
-    <!-- 2. 총 수입 / 총 지출 / 총 저축 / 현재 잔액 요약 카드 -->
-    <section class="summary">
-      <div class="summary-card income-card">
-        <h2>총 수입</h2>
-        <p id="totalIncome">0원</p>
+  <main id="home">
+    <section class="hero container">
+      <div>
+        <p class="eyebrow"><span class="status-dot"></span> Portfolio Homepage</p>
+        <h1>문제를 제품으로 바꾸는 개발자, 0Interpreter</h1>
+        <p class="hero-copy">
+          사용자 경험을 먼저 생각하고, 작은 기능도 끝까지 다듬는 웹 개발 포트폴리오입니다.
+          프론트엔드 화면 설계부터 인터랙션, 데이터 흐름까지 직접 구현합니다.
+        </p>
+        <div class="hero-actions">
+          <a class="btn" href="#projects" aria-label="프로젝트 보기">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            프로젝트 보기
+          </a>
+          <a class="btn secondary" href="#contact" aria-label="연락처 보기">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 4h16v16H4z" stroke="currentColor" stroke-width="2" />
+              <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            연락하기
+          </a>
+        </div>
       </div>
 
-      <div class="summary-card expense-card">
-        <h2>총 지출</h2>
-        <p id="totalExpense">0원</p>
-      </div>
-
-      <div class="summary-card saving-card">
-        <h2>총 저축</h2>
-        <p id="totalSaving">0원</p>
-      </div>
-
-      <div id="balanceCard" class="summary-card balance-card">
-        <h2>현재 잔액</h2>
-        <p id="balance">0원</p>
+      <div class="visual" aria-label="포트폴리오 대표 이미지">
+        <div class="portrait">
+          <svg viewBox="0 0 520 650" role="img" aria-label="개발 작업실 일러스트">
+            <rect width="520" height="650" fill="#ecf0e8" />
+            <rect x="48" y="62" width="424" height="260" rx="16" fill="#1b1f24" />
+            <rect x="72" y="90" width="376" height="204" rx="10" fill="#f7faf4" />
+            <path d="M104 132h120M104 166h190M104 200h142" stroke="#0f766e" stroke-width="14" stroke-linecap="round" />
+            <path d="M326 132h58M326 166h92M286 200h132" stroke="#c76f3a" stroke-width="14" stroke-linecap="round" />
+            <rect x="178" y="322" width="164" height="42" fill="#1b1f24" />
+            <rect x="132" y="364" width="256" height="26" rx="13" fill="#313942" />
+            <circle cx="260" cy="484" r="78" fill="#dff3e8" />
+            <path d="M206 502c24 42 84 42 108 0" stroke="#0f766e" stroke-width="16" stroke-linecap="round" />
+            <circle cx="230" cy="468" r="11" fill="#1b1f24" />
+            <circle cx="290" cy="468" r="11" fill="#1b1f24" />
+            <path d="M112 548h296" stroke="#d0dacb" stroke-width="18" stroke-linecap="round" />
+            <path d="M152 586h216" stroke="#c76f3a" stroke-width="16" stroke-linecap="round" />
+          </svg>
+        </div>
+        <div class="float-panel">
+          <strong>현재 집중하는 것</strong>
+          <span>명확한 UI, 빠른 피드백, 실제로 사용할 수 있는 웹 서비스 만들기</span>
+        </div>
       </div>
     </section>
 
-    <!-- 3. 입력 폼 -->
-    <section class="card">
-      <h2 class="section-title">기록 추가하기</h2>
+    <section id="about">
+      <div class="container">
+        <div class="section-head">
+          <h2>소개</h2>
+          <p>기술 자체보다 사용자가 어떤 순간에 편해지는지를 기준으로 설계하고 구현합니다.</p>
+        </div>
+        <div class="about-grid">
+          <article class="info-card">
+            <div class="icon" aria-hidden="true">01</div>
+            <h3>Frontend</h3>
+            <p>반응형 레이아웃, 접근성, 상태 변화가 자연스러운 인터페이스를 만듭니다.</p>
+          </article>
+          <article class="info-card">
+            <div class="icon" aria-hidden="true">02</div>
+            <h3>Product Thinking</h3>
+            <p>기능 목록보다 실제 흐름을 먼저 보고, 화면의 우선순위를 정리합니다.</p>
+          </article>
+          <article class="info-card">
+            <div class="icon" aria-hidden="true">03</div>
+            <h3>Reliable Build</h3>
+            <p>읽기 쉬운 코드와 예측 가능한 구조로 오래 수정할 수 있는 결과물을 지향합니다.</p>
+          </article>
+        </div>
+      </div>
+    </section>
 
-      <form id="moneyForm">
-        <div class="form-grid">
-          <div class="form-group">
-            <label for="date">날짜</label>
-            <input type="date" id="date" />
-          </div>
+    <section id="skills">
+      <div class="container">
+        <div class="section-head">
+          <h2>기술 스택</h2>
+          <p>아래 항목은 예시입니다. 본인의 실제 기술에 맞춰 텍스트만 바꾸면 됩니다.</p>
+        </div>
+        <div class="skills" aria-label="기술 목록">
+          <span class="tag">HTML</span>
+          <span class="tag">CSS</span>
+          <span class="tag">JavaScript</span>
+          <span class="tag">Responsive UI</span>
+          <span class="tag">Git</span>
+          <span class="tag">GitHub</span>
+          <span class="tag">Figma</span>
+          <span class="tag">Web Accessibility</span>
+        </div>
+      </div>
+    </section>
 
-          <div class="form-group">
-            <label for="type">구분</label>
-            <select id="type">
-              <option value="income">수입</option>
-              <option value="expense">지출</option>
-              <option value="saving">저축</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="category">카테고리</label>
-            <select id="category">
-              <option value="용돈">용돈</option>
-              <option value="간식">간식</option>
-              <option value="교통">교통</option>
-              <option value="학용품">학용품</option>
-              <option value="저축">저축</option>
-              <option value="기타">기타</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="title">항목명</label>
-            <input type="text" id="title" placeholder="예: 주간 용돈, 간식, 버스비" />
-          </div>
-
-          <div class="form-group">
-            <label for="amount">금액</label>
-            <input type="number" id="amount" placeholder="예: 5000" min="1" />
-          </div>
-
-          <div class="form-group full">
-            <label for="memo">메모</label>
-            <textarea id="memo" placeholder="간단한 메모를 적어보세요"></textarea>
-          </div>
+    <section id="projects">
+      <div class="container">
+        <div class="section-head">
+          <h2>프로젝트</h2>
+          <p>필터 버튼으로 프로젝트 유형을 확인할 수 있습니다.</p>
         </div>
 
-        <button type="submit" class="submit-btn">등록하기</button>
-      </form>
-    </section>
+        <div class="project-toolbar" aria-label="프로젝트 필터">
+          <button class="filter-btn active" type="button" data-filter="all">전체</button>
+          <button class="filter-btn" type="button" data-filter="web">웹</button>
+          <button class="filter-btn" type="button" data-filter="app">앱</button>
+          <button class="filter-btn" type="button" data-filter="tool">도구</button>
+        </div>
 
-    <!-- 4. 필터 버튼 + 월별 조회 -->
-    <section class="filter-area">
-      <div class="filter-buttons">
-        <button class="filter-btn active" data-filter="all">전체 보기</button>
-        <button class="filter-btn" data-filter="income">수입만 보기</button>
-        <button class="filter-btn" data-filter="expense">지출만 보기</button>
-        <button class="filter-btn" data-filter="saving">저축만 보기</button>
+        <div class="projects">
+          <article class="project-card" data-category="web">
+            <div class="project-art" aria-hidden="true">
+              <svg viewBox="0 0 420 142" width="100%" height="142">
+                <rect width="420" height="142" fill="#eef4ed" />
+                <rect x="28" y="26" width="170" height="90" rx="8" fill="#ffffff" />
+                <rect x="222" y="26" width="170" height="90" rx="8" fill="#dff3e8" />
+                <path d="M52 54h92M52 76h118M52 98h72" stroke="#0f766e" stroke-width="10" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div class="project-body">
+              <h3>Portfolio Homepage</h3>
+              <p>개인 소개, 프로젝트, 연락 정보를 담은 반응형 포트폴리오 웹사이트입니다.</p>
+              <div class="project-meta">
+                <span class="small-tag">HTML</span>
+                <span class="small-tag">CSS</span>
+                <span class="small-tag">JavaScript</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card" data-category="app">
+            <div class="project-art" aria-hidden="true">
+              <svg viewBox="0 0 420 142" width="100%" height="142">
+                <rect width="420" height="142" fill="#edf3fa" />
+                <rect x="52" y="20" width="112" height="102" rx="12" fill="#ffffff" />
+                <rect x="190" y="20" width="178" height="102" rx="12" fill="#dceaf7" />
+                <path d="M214 50h92M214 76h116M214 102h58" stroke="#315f86" stroke-width="10" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div class="project-body">
+              <h3>Money Tracker</h3>
+              <p>수입과 지출을 입력하고 합계를 확인하는 로컬 저장 기반 가계부 앱입니다.</p>
+              <div class="project-meta">
+                <span class="small-tag">LocalStorage</span>
+                <span class="small-tag">Form UI</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="project-card" data-category="tool">
+            <div class="project-art" aria-hidden="true">
+              <svg viewBox="0 0 420 142" width="100%" height="142">
+                <rect width="420" height="142" fill="#f7eadc" />
+                <rect x="48" y="30" width="324" height="82" rx="12" fill="#ffffff" />
+                <circle cx="88" cy="71" r="22" fill="#c76f3a" />
+                <path d="M136 56h154M136 84h112" stroke="#1b1f24" stroke-width="10" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div class="project-body">
+              <h3>Study Helper</h3>
+              <p>학습 기록과 목표를 정리하는 간단한 생산성 도구 컨셉입니다.</p>
+              <div class="project-meta">
+                <span class="small-tag">UX</span>
+                <span class="small-tag">Dashboard</span>
+              </div>
+            </div>
+          </article>
+        </div>
       </div>
-
-      <label class="month-filter" for="monthFilter">
-        월별 조회
-        <input type="month" id="monthFilter" />
-      </label>
     </section>
 
-    <!-- 5. 기록 목록 표 -->
-    <section class="card">
-      <h2 class="section-title">기록 목록</h2>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>날짜</th>
-              <th>구분</th>
-              <th>카테고리</th>
-              <th>항목명</th>
-              <th>금액</th>
-              <th>메모</th>
-              <th>삭제</th>
-            </tr>
-          </thead>
-
-          <tbody id="recordList">
-            <!-- JavaScript로 기록이 들어가는 자리 -->
-          </tbody>
-        </table>
+    <section id="contact">
+      <div class="container">
+        <div class="contact-panel">
+          <div>
+            <h2>함께 만들 이야기가 있다면</h2>
+            <p>
+              아래 연락처와 링크는 예시입니다. 본인의 이메일, GitHub, 블로그 주소로 바꾸면
+              실제 포트폴리오로 바로 사용할 수 있습니다.
+            </p>
+          </div>
+          <div class="contact-list">
+            <button class="contact-link" type="button" id="copyEmail">
+              1terpreter@gmail.com
+              <span>복사</span>
+            </button>
+            <a class="contact-link" href="https://github.com/0Interpreter" target="_blank" rel="noreferrer">
+              GitHub
+              <span>열기</span>
+            </a>
+            <a class="contact-link" href="#home">
+              맨 위로
+              <span>이동</span>
+            </a>
+          </div>
+        </div>
       </div>
-
-      <p id="emptyMessage" class="empty-message">아직 등록된 기록이 없어요.</p>
     </section>
+  </main>
 
-    <!-- 6. 전체 기록 초기화 버튼 -->
-    <button id="resetBtn" class="reset-btn">전체 기록 초기화</button>
+  <footer class="footer">
+    <div class="container">© 2026 0Interpreter. Built with HTML, CSS, and JavaScript.</div>
+  </footer>
 
-    <!-- 7. 하단 저작권 문구 -->
-    <footer>© 2026 크레오디교육연구소</footer>
-  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite">이메일을 복사했습니다.</div>
 
   <script>
-    /*
-      이번 버전에 추가된 기능
-
-      1. 구분에 "저축" 추가
-      2. 카테고리 입력 추가
-      3. 기록 목록을 날짜순으로 정렬
-      4. 현재 잔액이 0원보다 작으면 빨간색으로 표시
-      5. 월별 조회 기능 추가
-    */
-
-    let records = [];
-    let currentFilter = "all";
-    let currentMonth = "";
-
-    const STORAGE_KEY = "myMoneyBookRecordsV2";
-
-    // HTML 요소 가져오기
-    const moneyForm = document.getElementById("moneyForm");
-    const dateInput = document.getElementById("date");
-    const typeInput = document.getElementById("type");
-    const categoryInput = document.getElementById("category");
-    const titleInput = document.getElementById("title");
-    const amountInput = document.getElementById("amount");
-    const memoInput = document.getElementById("memo");
-
-    const recordList = document.getElementById("recordList");
-    const emptyMessage = document.getElementById("emptyMessage");
-
-    const totalIncomeEl = document.getElementById("totalIncome");
-    const totalExpenseEl = document.getElementById("totalExpense");
-    const totalSavingEl = document.getElementById("totalSaving");
-    const balanceEl = document.getElementById("balance");
-    const balanceCard = document.getElementById("balanceCard");
-
     const filterButtons = document.querySelectorAll(".filter-btn");
-    const monthFilter = document.getElementById("monthFilter");
-    const resetBtn = document.getElementById("resetBtn");
+    const projectCards = document.querySelectorAll(".project-card");
+    const copyEmailButton = document.getElementById("copyEmail");
+    const toast = document.getElementById("toast");
 
-    // 오늘 날짜를 yyyy-mm-dd 형태로 만들어주는 함수
-    function getTodayDate() {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, "0");
-      const day = String(today.getDate()).padStart(2, "0");
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const filter = button.dataset.filter;
 
-      return `${year}-${month}-${day}`;
-    }
-
-    // 숫자를 1,000원처럼 천 단위 콤마가 들어간 금액으로 바꾸는 함수
-    function formatMoney(number) {
-      return Number(number).toLocaleString("ko-KR") + "원";
-    }
-
-    // localStorage에 기록 저장하기
-    function saveRecords() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
-    }
-
-    // localStorage에서 기록 불러오기
-    function loadRecords() {
-      const savedData = localStorage.getItem(STORAGE_KEY);
-
-      if (savedData) {
-        records = JSON.parse(savedData);
-      }
-    }
-
-    // 요약 카드는 전체 기록 기준으로 계산합니다.
-    // 잔액은 총 수입 - 총 지출 - 총 저축으로 계산했습니다.
-    function updateSummary() {
-      let totalIncome = 0;
-      let totalExpense = 0;
-      let totalSaving = 0;
-
-      records.forEach(function(record) {
-        if (record.type === "income") {
-          totalIncome += record.amount;
-        } else if (record.type === "expense") {
-          totalExpense += record.amount;
-        } else if (record.type === "saving") {
-          totalSaving += record.amount;
-        }
-      });
-
-      const balance = totalIncome - totalExpense - totalSaving;
-
-      totalIncomeEl.textContent = formatMoney(totalIncome);
-      totalExpenseEl.textContent = formatMoney(totalExpense);
-      totalSavingEl.textContent = formatMoney(totalSaving);
-      balanceEl.textContent = formatMoney(balance);
-
-      // 잔액이 마이너스이면 빨간색 카드로 바꿉니다.
-      if (balance < 0) {
-        balanceCard.classList.add("balance-negative");
-      } else {
-        balanceCard.classList.remove("balance-negative");
-      }
-    }
-
-    // 현재 선택된 구분 필터와 월별 필터에 맞는 기록만 골라냅니다.
-    function getFilteredRecords() {
-      let filteredRecords = records;
-
-      if (currentFilter !== "all") {
-        filteredRecords = filteredRecords.filter(function(record) {
-          return record.type === currentFilter;
-        });
-      }
-
-      if (currentMonth !== "") {
-        filteredRecords = filteredRecords.filter(function(record) {
-          return record.date.startsWith(currentMonth);
-        });
-      }
-
-      // 날짜순 정렬: 오래된 날짜가 위, 최신 날짜가 아래에 보입니다.
-      filteredRecords = filteredRecords.slice().sort(function(a, b) {
-        return new Date(a.date) - new Date(b.date);
-      });
-
-      return filteredRecords;
-    }
-
-    // 구분 값을 화면에 보여줄 한글 이름과 색상 클래스로 바꿉니다.
-    function getTypeInfo(type) {
-      if (type === "income") {
-        return { text: "수입", className: "type-income" };
-      }
-
-      if (type === "expense") {
-        return { text: "지출", className: "type-expense" };
-      }
-
-      return { text: "저축", className: "type-saving" };
-    }
-
-    // 기록 목록을 화면에 다시 그리기
-    function renderRecords() {
-      recordList.innerHTML = "";
-
-      const filteredRecords = getFilteredRecords();
-
-      if (filteredRecords.length === 0) {
-        emptyMessage.style.display = "block";
-      } else {
-        emptyMessage.style.display = "none";
-      }
-
-      filteredRecords.forEach(function(record) {
-        const tr = document.createElement("tr");
-        const typeInfo = getTypeInfo(record.type);
-
-        tr.innerHTML = `
-          <td>${record.date}</td>
-          <td class="${typeInfo.className}">${typeInfo.text}</td>
-          <td>${record.category}</td>
-          <td>${record.title}</td>
-          <td>${formatMoney(record.amount)}</td>
-          <td>${record.memo}</td>
-          <td>
-            <button class="delete-btn" onclick="deleteRecord(${record.id})">
-              삭제
-            </button>
-          </td>
-        `;
-
-        recordList.appendChild(tr);
-      });
-    }
-
-    // 화면 전체를 새로 갱신하는 함수
-    function updateScreen() {
-      updateSummary();
-      renderRecords();
-    }
-
-    // 기록 등록하기
-    moneyForm.addEventListener("submit", function(event) {
-      event.preventDefault();
-
-      const date = dateInput.value || getTodayDate();
-      const type = typeInput.value;
-      const category = categoryInput.value;
-      const title = titleInput.value.trim();
-      const amount = Number(amountInput.value);
-      const memo = memoInput.value.trim();
-
-      if (title === "") {
-        alert("항목명을 입력해 주세요.");
-        titleInput.focus();
-        return;
-      }
-
-      if (!amount || amount <= 0) {
-        alert("금액은 0원보다 큰 숫자로 입력해 주세요.");
-        amountInput.focus();
-        return;
-      }
-
-      const newRecord = {
-        id: Date.now(),
-        date: date,
-        type: type,
-        category: category,
-        title: title,
-        amount: amount,
-        memo: memo
-      };
-
-      records.push(newRecord);
-      saveRecords();
-      updateScreen();
-
-      // 등록 후 입력창 비우기
-      moneyForm.reset();
-    });
-
-    // 기록 삭제하기
-    function deleteRecord(id) {
-      records = records.filter(function(record) {
-        return record.id !== id;
-      });
-
-      saveRecords();
-      updateScreen();
-    }
-
-    // 필터 버튼 클릭 기능
-    filterButtons.forEach(function(button) {
-      button.addEventListener("click", function() {
-        currentFilter = button.dataset.filter;
-
-        filterButtons.forEach(function(btn) {
-          btn.classList.remove("active");
-        });
-
+        filterButtons.forEach((item) => item.classList.remove("active"));
         button.classList.add("active");
-        renderRecords();
+
+        projectCards.forEach((card) => {
+          const shouldShow = filter === "all" || card.dataset.category === filter;
+          card.style.display = shouldShow ? "" : "none";
+        });
       });
     });
 
-    // 월별 조회 기능
-    monthFilter.addEventListener("change", function() {
-      currentMonth = monthFilter.value;
-      renderRecords();
-    });
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      window.setTimeout(() => {
+        toast.classList.remove("show");
+      }, 1800);
+    }
 
-    // 전체 기록 초기화 기능
-    resetBtn.addEventListener("click", function() {
-      const answer = confirm("정말 모든 기록을 삭제할까요?");
+    copyEmailButton.addEventListener("click", async () => {
+      const email = "1terpreter@gmail.com";
 
-      if (answer) {
-        records = [];
-        saveRecords();
-        updateScreen();
+      try {
+        await navigator.clipboard.writeText(email);
+        showToast("이메일을 복사했습니다.");
+      } catch (error) {
+        showToast(email);
       }
     });
-
-    // 페이지가 처음 열릴 때 저장된 기록을 불러오고 화면에 보여주기
-    loadRecords();
-    updateScreen();
   </script>
 </body>
 </html>
